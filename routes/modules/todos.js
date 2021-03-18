@@ -4,6 +4,18 @@ const db = require('../../models')
 const router = express.Router()
 const Todo = db.Todo
 
+router.get('/new', (req, res) => {
+  res.render('new')
+})
+
+router.post('/', (req, res) => {
+  const { name } = req.body
+  const UserId = req.user.id
+  return Todo.create({ name, UserId })
+    .then(() => res.redirect('/'))
+    .catch(error => console.log(error))
+})
+
 router.get('/:id', (req, res) => {
   const id = req.params.id
   const UserId = req.user.id
