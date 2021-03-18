@@ -18,4 +18,18 @@ router.get('/:id', (req, res) => {
     .catch(error => console.log(error))
 })
 
+router.get('/:id/edit', (req, res) => {
+  const id = req.params.id
+  const UserId = req.user.id
+  return Todo.findOne({ where: { id, UserId } })
+    .then(todo => {
+      if (!todo) {
+        console.log('todo not found.')
+        return res.redirect('/')
+      }
+      res.render('edit', { todo: todo.toJSON() })
+    })
+    .catch(error => console.log(error))
+})
+
 module.exports = router
