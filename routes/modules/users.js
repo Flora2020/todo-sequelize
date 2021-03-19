@@ -12,12 +12,9 @@ router.get('/login', (req, res) => {
 
 router.post('/login', passport.authenticate('local', {
   successRedirect: '/',
-  failureRedirect: '/users/login'
+  failureRedirect: '/users/login',
+  failureFlash: true
 }))
-
-router.post('/login', (req, res) => {
-  res.send('login')
-})
 
 router.get('/register', (req, res) => {
   res.render('register')
@@ -25,14 +22,28 @@ router.get('/register', (req, res) => {
 
 router.post('/register', (req, res) => {
   const { name, email, password, confirmPassword } = req.body
+  const error = []
+
+  if (!name || !email || !password || !confirmPassword) {
+    error.push('Please fill in all input columns.')
+  }
+
+  if (password !== confirmPassword) {
+    error.push('Your password and confirmation password do not match.')
+  }
+
+  if (error.length > 0) {
+    return res.render('register', { name, email, password, confirmPassword, error })
+  }
+
   User.findOne({ where: { email } }).then(user => {
     if (user) {
-      console.log('User already exists')
+      error.push(`${email} is already registered.`)
       return res.render('register', {
         name,
-        email,
         password,
-        confirmPassword
+        confirmPassword,
+        error
       })
     }
     return bcrypt
@@ -43,14 +54,18 @@ router.post('/register', (req, res) => {
         email,
         password: hash
       }))
-      .then(() => res.redirect('/'))
-      .catch(err => console.log(err))
+      .then(() => res.redirect('/users/login'))
+      .catch(err => {
+        console.log(err)
+        return res.render('error')
+      })
   })
 })
 
 router.get('/logout', (req, res) => {
   req.logout()
-  res.redirect('/')
+  req.flash('success_msg', 'You have successfully logged out.')
+  res.redirect('/users/login')
 })
 
 module.exports = router

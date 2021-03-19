@@ -6,12 +6,17 @@ const Todo = db.Todo
 
 router.get('/', (req, res) => {
   const UserId = req.user.id
+  const error = []
   return Todo.findAll({
     raw: true,
     nest: true,
     where: { UserId }
   })
-    .then((todos) => { return res.render('index', { todos: todos }) })
+    .then((todos) => {
+      console.log('todos:', todos)
+      if (todos.length < 1) { error.push('Congratulations! Your todo list is empty!') }
+      return res.render('index', { todos, error })
+    })
     .catch((error) => { return res.status(422).json(error) })
 })
 

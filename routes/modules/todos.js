@@ -13,7 +13,10 @@ router.post('/', (req, res) => {
   const UserId = req.user.id
   return Todo.create({ name, UserId })
     .then(() => res.redirect('/'))
-    .catch(error => console.log(error))
+    .catch(error => {
+      console.log(error)
+      return res.render('error')
+    })
 })
 
 router.get('/:id', (req, res) => {
@@ -22,12 +25,15 @@ router.get('/:id', (req, res) => {
   return Todo.findOne({ where: { id, UserId } })
     .then(todo => {
       if (!todo) {
-        console.log('todo not found.')
+        req.flash('warning_msg', 'Todo not found.')
         return res.redirect('/')
       }
       res.render('detail', { todo: todo.toJSON() })
     })
-    .catch(error => console.log(error))
+    .catch(error => {
+      console.log(error)
+      return res.render('error')
+    })
 })
 
 router.put('/:id', (req, res) => {
@@ -38,7 +44,7 @@ router.put('/:id', (req, res) => {
   return Todo.findOne({ where: { id, UserId } })
     .then(todo => {
       if (!todo) {
-        console.log('todo not found.')
+        req.flash('warning_msg', 'Todo not found.')
         return res.redirect('/')
       }
       todo.name = name
@@ -46,7 +52,10 @@ router.put('/:id', (req, res) => {
       todo.updatedAt = new Date()
       return todo.save()
         .then(() => res.redirect(`/todos/${id}`))
-        .catch(error => console.log(error))
+        .catch(error => {
+          console.log(error)
+          return res.render('error')
+        })
     })
 })
 
@@ -55,10 +64,17 @@ router.delete('/:id', (req, res) => {
   const UserId = req.user.id
   return Todo.findOne({ where: { id, UserId } })
     .then((todo) => {
+      if (!todo) {
+        req.flash('warning_msg', 'Todo not found.')
+        return res.redirect('/')
+      }
       todo.destroy()
       return res.redirect('/')
     })
-    .catch(error => console.log(error))
+    .catch(error => {
+      console.log(error)
+      return res.render('error')
+    })
 })
 
 router.get('/:id/edit', (req, res) => {
@@ -67,12 +83,15 @@ router.get('/:id/edit', (req, res) => {
   return Todo.findOne({ where: { id, UserId } })
     .then(todo => {
       if (!todo) {
-        console.log('todo not found.')
+        req.flash('warning_msg', 'Todo not found.')
         return res.redirect('/')
       }
       res.render('edit', { todo: todo.toJSON() })
     })
-    .catch(error => console.log(error))
+    .catch(error => {
+      console.log(error)
+      return res.render('error')
+    })
 })
 
 module.exports = router
