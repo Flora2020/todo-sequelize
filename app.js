@@ -1,3 +1,7 @@
+if (process.NODE_ENV !== 'production') {
+  require('dotenv').config()
+}
+
 const express = require('express')
 const session = require('express-session')
 const exphbs = require('express-handlebars')
@@ -9,13 +13,13 @@ const usePassport = require('./config/passport')
 const router = require('./routes/index.js')
 
 const app = express()
-const PORT = 3000
+const PORT = process.env.PORT
 
 app.engine('hbs', exphbs({ defaultLayout: 'main', extname: '.hbs' }))
 app.set('view engine', 'hbs')
 
 app.use(session({
-  secret: 'feUw$48A_9zY3%Mo3/6O2Qc+3pG9n$m',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: true
 }))
