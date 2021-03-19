@@ -13,7 +13,6 @@ router.get('/', (req, res) => {
     where: { UserId }
   })
     .then((todos) => {
-      console.log('todos:', todos)
       if (todos.length < 1) { error.push('Congratulations! Your todo list is empty!') }
       return res.render('index', { todos, error })
     })
